@@ -1,6 +1,7 @@
 package com.peters.userservice.controller;
 
 
+import com.peters.userservice.controller.proxy.FeignProxy;
 import com.peters.userservice.dto.ChangePasswordDTO;
 import com.peters.userservice.dto.CustomResponse;
 import com.peters.userservice.dto.UserRequestDto;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomerController {
     private final IUserService userService;
+    private final FeignProxy feignProxy;
 
     @GetMapping("/{userId}/profile")
     public ResponseEntity<CustomResponse> userProfile(@PathVariable("userId") Long userId){
@@ -35,6 +37,11 @@ public class CustomerController {
     @DeleteMapping("/{userId}/profile")
     public ResponseEntity<CustomResponse> deleteProfile(@PathVariable("userId") Long userId){
         return userService.deleteProfile(userId);
+    }
+
+    @GetMapping("/get-all-books")
+    public ResponseEntity<CustomResponse> getAllBooks(@RequestParam(defaultValue = "0") int page){
+        return feignProxy.getAllBooks(page);
     }
 
 }

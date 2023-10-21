@@ -17,7 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
     private List<GrantedAuthority> authorities;
-    private boolean isAccountLocked;
+
 
     public CustomUserDetails(User user) {
         this.username = user.getEmail();
@@ -25,7 +25,6 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = user.getRoles().stream()
                 .map(UserRole::getName)
                 .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        this.isAccountLocked = user.isAccountDeleted();
     }
 
     @Override
@@ -50,7 +49,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return isAccountLocked;
+        return true;
     }
 
     @Override

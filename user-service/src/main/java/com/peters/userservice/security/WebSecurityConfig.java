@@ -39,8 +39,7 @@ public class WebSecurityConfig {
     };
 
     private static final String[] CUSTOMER_SECURED_URL = {
-            "/api/v1/auth/user/**",
-            "/api/v1/payment/**"
+            "/api/v1/auth/user/**"
 
     };
 
@@ -51,7 +50,7 @@ public class WebSecurityConfig {
                         .requestMatchers(UN_SECURED_URL).permitAll()
                         .requestMatchers(ADMIN_SECURED_URL).hasRole("ADMIN")
                         .requestMatchers(CUSTOMER_SECURED_URL).hasRole("USER")
-                        .anyRequest().hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
