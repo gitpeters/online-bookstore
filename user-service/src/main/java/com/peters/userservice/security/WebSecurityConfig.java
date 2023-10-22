@@ -20,8 +20,6 @@ public class WebSecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
     private static final String[] UN_SECURED_URL = {
             "/api/v1/user/**",
-            "/api/v1/auth/**",
-            "/api/v1/user-role/**",
             "/v2/api-docs",
             "/v3/api-docs/**",
             "/swagger-resources",
@@ -48,8 +46,8 @@ public class WebSecurityConfig {
         http
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(UN_SECURED_URL).permitAll()
-                        .requestMatchers(ADMIN_SECURED_URL).hasRole("ADMIN")
                         .requestMatchers(CUSTOMER_SECURED_URL).hasRole("USER")
+                        .requestMatchers(ADMIN_SECURED_URL).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .csrf().disable()
