@@ -7,14 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="user-service" />
         <module name="book-service" />
         <module name="naming-server" />
-        <module name="user-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="book-service" options="-parameters" />
       <module name="naming-server" options="-parameters" />
       <module name="user-service" options="-parameters" />

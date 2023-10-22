@@ -16,9 +16,11 @@ public class GatewayConfig {
                                 .addRequestParameter("MyParams", "ParamValue"))
                         .uri("http://httpbin.org:80"))
                 .route(predicate->predicate.path("/api/v1/book/**")
-                        .uri("lb://book"))
+                        .uri("lb://book-service"))
                 .route(predicate->predicate.path("/api/v1/user/**")
-                        .uri("lb://user"))
+                        .uri("lb://user-service"))
+                .route(predicate->predicate.path("/api/v1/auth/user/**")
+                        .uri("lb://user-service"))
 
                 .build();
     }
