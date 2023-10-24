@@ -87,20 +87,4 @@ public class OrderServiceImpl implements OrderService{
         return ResponseEntity.ok(response);
     }
 
-    private CartResponse mapToCartResponse(Cart cart, List<Cart> carts) {
-        BigDecimal totalAmount = BigDecimal.valueOf(0);
-        int totalQuantity = 0;
-        for(Cart c : carts){
-            totalQuantity += c.getQuantity();
-            totalAmount.add(c.getSubTotal());
-        }
-        CartResponse response = CartResponse.builder()
-                .cart(cart)
-                .totalPrice(totalAmount)
-                .totalQuantity(totalQuantity)
-                .status("Success")
-                .build();
-
-        return response;
-    }
 }
