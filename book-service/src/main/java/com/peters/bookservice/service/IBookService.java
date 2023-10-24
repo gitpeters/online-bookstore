@@ -17,4 +17,8 @@ public interface IBookService {
     ResponseEntity<CustomRequestResponse> getBooksByPublishedDate(LocalDate date);
 
     ResponseEntity<CustomRequestResponse> addBook(BookRequest request);
+
+    ResponseEntity<CustomRequestResponse> editBook(Long bookId, BookRequest request);
+
+    ResponseEntity<CustomRequestResponse> deleteBook(Long bookId);
 }

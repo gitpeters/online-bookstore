@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("api/v1/auth/user")
 @Tag(name = "Authenticated User")
@@ -42,6 +44,21 @@ public class CustomerController {
     @GetMapping("/get-all-books")
     public ResponseEntity<CustomResponse> getAllBooks(@RequestParam(defaultValue = "0") int page){
         return feignProxy.getAllBooks(page);
+    }
+
+    @GetMapping("/get-books-by-author")
+    public ResponseEntity<CustomResponse> getBooksByAuthor(@RequestParam("author") String authorName){
+        return feignProxy.getBooksByAuthor(authorName);
+    }
+
+    @GetMapping("/get-books-by-title")
+    public ResponseEntity<CustomResponse> getBooksByTitle(@RequestParam("title") String title){
+        return feignProxy.getBooksByTitle(title);
+    }
+
+    @GetMapping("/get-books-by-date")
+    public ResponseEntity<CustomResponse> getBooksByPublishedDate(@RequestParam("published_date") String date){
+        return feignProxy.getBooksByPublishedDate(date);
     }
 
 }

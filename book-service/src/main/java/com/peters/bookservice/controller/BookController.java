@@ -38,4 +38,14 @@ public class BookController {
     public ResponseEntity<CustomRequestResponse> getBooksByPublishedDate(@RequestParam("date") LocalDate date){
         return bookService.getBooksByPublishedDate(date);
     }
+
+    @PutMapping("{bookId}/edit")
+    public ResponseEntity<CustomRequestResponse> editBook(@PathVariable("bookId") Long bookId, @RequestBody BookRequest request){
+        return bookService.editBook(bookId,request);
+    }
+
+    @DeleteMapping("{bookId}/delete")
+    public ResponseEntity<CustomRequestResponse> deleteBook(@PathVariable("bookId") Long bookId){
+        return bookService.deleteBook(bookId);
+    }
 }

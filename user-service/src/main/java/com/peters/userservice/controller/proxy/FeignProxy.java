@@ -4,10 +4,7 @@ import com.peters.userservice.dto.BookRequest;
 import com.peters.userservice.dto.CustomResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -26,5 +23,10 @@ public interface FeignProxy {
     ResponseEntity<CustomResponse> getBooksByAuthor(@RequestParam("author") String author);
 
     @GetMapping("/get-by-published_date")
-    ResponseEntity<CustomResponse> getBooksByPublishedDate(@RequestParam("date") LocalDate date);
+    ResponseEntity<CustomResponse> getBooksByPublishedDate(@RequestParam("date") String date);
+
+    @PutMapping("{bookId}/edit")
+    ResponseEntity<CustomResponse> editBook(@PathVariable("bookId") Long bookId, @RequestBody BookRequest request);
+    @DeleteMapping("{bookId}/delete")
+    ResponseEntity<CustomResponse> deleteBook(@PathVariable("bookId") Long bookId);
 }
