@@ -1,7 +1,8 @@
 package com.peters.userservice.controller;
 
 
-import com.peters.userservice.controller.proxy.FeignProxy;
+import com.peters.userservice.controller.proxy.BookFeignProxy;
+import com.peters.userservice.controller.proxy.OrderFeignProxy;
 import com.peters.userservice.dto.ChangePasswordDTO;
 import com.peters.userservice.dto.CustomResponse;
 import com.peters.userservice.dto.UserRequestDto;
@@ -11,15 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("api/v1/auth/user")
 @Tag(name = "Authenticated User")
 @RequiredArgsConstructor
 public class CustomerController {
     private final IUserService userService;
-    private final FeignProxy feignProxy;
+    private final BookFeignProxy bookFeignProxy;
+    private final OrderFeignProxy orderFeignProxy;
 
     @GetMapping("/{userId}/profile")
     public ResponseEntity<CustomResponse> userProfile(@PathVariable("userId") Long userId){
@@ -43,22 +43,27 @@ public class CustomerController {
 
     @GetMapping("/get-all-books")
     public ResponseEntity<CustomResponse> getAllBooks(@RequestParam(defaultValue = "0") int page){
-        return feignProxy.getAllBooks(page);
+        return bookFeignProxy.getAllBooks(page);
     }
 
     @GetMapping("/get-books-by-author")
     public ResponseEntity<CustomResponse> getBooksByAuthor(@RequestParam("author") String authorName){
-        return feignProxy.getBooksByAuthor(authorName);
+        return bookFeignProxy.getBooksByAuthor(authorName);
     }
 
     @GetMapping("/get-books-by-title")
     public ResponseEntity<CustomResponse> getBooksByTitle(@RequestParam("title") String title){
-        return feignProxy.getBooksByTitle(title);
+        return bookFeignProxy.getBooksByTitle(title);
     }
 
     @GetMapping("/get-books-by-date")
     public ResponseEntity<CustomResponse> getBooksByPublishedDate(@RequestParam("published_date") String date){
-        return feignProxy.getBooksByPublishedDate(date);
+        return bookFeignProxy.getBooksByPublishedDate(date);
+    }
+
+    @GetMapping("/add-to-cart")
+    public ResponseEntity<CustomResponse> addBookToCart(@RequestParam("bookId") Long bookId, @RequestParam("userId") Long userId, @RequestParam("quantity") int quantity){
+        return orderFeignProxy.addBookToCart(bookId, userId, quantity);
     }
 
 }

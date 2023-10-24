@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="user-service" />
+        <module name="order-service" />
         <module name="book-service" />
         <module name="naming-server" />
       </profile>
@@ -19,6 +20,7 @@
       <module name="api-gateway" options="-parameters" />
       <module name="book-service" options="-parameters" />
       <module name="naming-server" options="-parameters" />
+      <module name="order-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

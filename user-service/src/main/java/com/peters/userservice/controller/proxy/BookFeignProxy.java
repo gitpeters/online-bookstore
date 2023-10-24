@@ -6,10 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @FeignClient(name = "book-service", url = "http://localhost:8080/api/v1/book")
-public interface FeignProxy {
+public interface BookFeignProxy {
     @PostMapping("/add")
     ResponseEntity<CustomResponse> addBook(@RequestBody BookRequest request);
 

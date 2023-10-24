@@ -1,7 +1,7 @@
 package com.peters.userservice.controller;
 
 
-import com.peters.userservice.controller.proxy.FeignProxy;
+import com.peters.userservice.controller.proxy.BookFeignProxy;
 import com.peters.userservice.dto.BookRequest;
 import com.peters.userservice.dto.CustomResponse;
 import com.peters.userservice.dto.UserResponseDto;
@@ -29,7 +29,7 @@ import java.util.List;
 public class AdminController {
     private final IRoleService roleService;
     private final IUserService userService;
-    private final FeignProxy feignProxy;
+    private final BookFeignProxy bookFeignProxy;
 
     @Operation(
             summary = "fetch all users",
@@ -107,17 +107,17 @@ public class AdminController {
 
     @PostMapping("/add-book")
     public ResponseEntity<CustomResponse> addNewBook(@RequestBody BookRequest request){
-        return feignProxy.addBook(request);
+        return bookFeignProxy.addBook(request);
     }
 
     @PutMapping("edit-book/{bookId}")
     public ResponseEntity<CustomResponse> editBook(@PathVariable("bookId") Long bookId, @RequestBody BookRequest request){
-        return feignProxy.editBook(bookId, request);
+        return bookFeignProxy.editBook(bookId, request);
     }
 
     @DeleteMapping("delete-book/{bookId}")
     public ResponseEntity<CustomResponse> deleteBook(@PathVariable("bookId") Long bookId){
-        return feignProxy.deleteBook(bookId);
+        return bookFeignProxy.deleteBook(bookId);
     }
 
 }

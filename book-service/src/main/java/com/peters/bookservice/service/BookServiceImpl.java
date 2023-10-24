@@ -1,6 +1,7 @@
 package com.peters.bookservice.service;
 
 import com.peters.bookservice.dto.BookRequest;
+import com.peters.bookservice.dto.BookResponse;
 import com.peters.bookservice.dto.CustomRequestResponse;
 import com.peters.bookservice.dto.ResponseStatus;
 import com.peters.bookservice.entity.Book;
@@ -122,6 +123,22 @@ public class BookServiceImpl implements IBookService{
             return ResponseEntity.ok(new CustomRequestResponse(HttpStatus.OK.name(), updatedBook, "Successfully updated book"));
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomRequestResponse("Error", "Something went wrong. Could not update book"));
+    }
+
+    @Override
+    public ResponseEntity<CustomRequestResponse> getBookById(Long bookId) {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
+        if(bookOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomRequestResponse(HttpStatus.NOT_FOUND.name(), "No book found for this id -> "+bookId));
+        }
+        Book book = bookOptional.get();
+        BookResponse response = BookResponse.builder()
+                .author(book.getAuthor())
+                .title(book.getTitle())
+                .price(book.getPrice())
+                .publishedDate(book.getPublishedDate())
+                .build();
+        return ResponseEntity.ok(new CustomRequestResponse(HttpStatus.OK.name(), response, "Successful"));
     }
 
     @Override

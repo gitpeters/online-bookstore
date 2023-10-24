@@ -21,6 +21,8 @@ public class GatewayConfig {
                         .uri("lb://user-service"))
                 .route(predicate->predicate.path("/api/v1/auth/user/**")
                         .uri("lb://user-service"))
+                .route(predicate->predicate.path("/api/v1/orders/**")
+                        .uri("lb://order-service"))
 
                 .build();
     }

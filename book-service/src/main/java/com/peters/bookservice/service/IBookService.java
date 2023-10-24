@@ -21,4 +21,6 @@ public interface IBookService {
     ResponseEntity<CustomRequestResponse> editBook(Long bookId, BookRequest request);
 
     ResponseEntity<CustomRequestResponse> deleteBook(Long bookId);
+
+    ResponseEntity<CustomRequestResponse> getBookById(Long bookId);
 }
