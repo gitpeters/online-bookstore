@@ -2,8 +2,10 @@ package com.peters.orderservice.service;
 
 import com.peters.orderservice.controller.proxy.FeignProxy;
 import com.peters.orderservice.dto.BookResponse;
+import com.peters.orderservice.dto.CartResponse;
 import com.peters.orderservice.dto.CustomResponse;
 import com.peters.orderservice.model.Cart;
+import com.peters.orderservice.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,13 +14,16 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService{
     private final FeignProxy feignProxy;
+    private final CartRepository cartRepository;
     @Override
     public ResponseEntity<CustomResponse> addBookToCart(Long bookId, Long userId, int quantity) {
         ResponseEntity<CustomResponse> response = feignProxy.getBookById(bookId);
@@ -44,13 +49,58 @@ public class OrderServiceImpl implements OrderService{
                             .dateAdded(LocalDate.now())
                             .build();
 
+                    cartRepository.save(cart);
+
                     return ResponseEntity.ok(new CustomResponse(HttpStatus.OK.name(), cart, "Successfully added book to cart"));
                 }
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND.name(), customResponse, "Could not find book by this id: " + bookId));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND, "Could not find book by this id: " + bookId));
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong"));
     }
 
 
+    @Override
+    public ResponseEntity<?> getAllCarts(Long userId) {
+        List<Cart> carts = cartRepository.findByUserId(userId);
+        log.info("fetch all carts for a user {} ", carts);
+
+        BigDecimal totalAmount = BigDecimal.ZERO; // Initialize totalAmount to zero
+        int totalQuantity = 0;
+        for (Cart c : carts) {
+            totalQuantity += c.getQuantity();
+            totalAmount = totalAmount.add(c.getSubTotal()); // Update totalAmount
+        }
+
+        CustomResponse response = CustomResponse.builder()
+                .totalQuantity(totalQuantity)
+                .totalAmount(totalAmount)
+                .data(carts)
+                .message("Successfully retrieve all carts")
+                .status("Successful")
+                .totalNumberOfItems(carts.size())
+                .build();
+
+        if(carts.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new CustomResponse(HttpStatus.NOT_FOUND, "No cart found for user "));
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    private CartResponse mapToCartResponse(Cart cart, List<Cart> carts) {
+        BigDecimal totalAmount = BigDecimal.valueOf(0);
+        int totalQuantity = 0;
+        for(Cart c : carts){
+            totalQuantity += c.getQuantity();
+            totalAmount.add(c.getSubTotal());
+        }
+        CartResponse response = CartResponse.builder()
+                .cart(cart)
+                .totalPrice(totalAmount)
+                .totalQuantity(totalQuantity)
+                .status("Success")
+                .build();
+
+        return response;
+    }
 }

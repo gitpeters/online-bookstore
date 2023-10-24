@@ -7,6 +7,7 @@ import com.peters.bookservice.dto.ResponseStatus;
 import com.peters.bookservice.entity.Book;
 import com.peters.bookservice.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -26,6 +27,7 @@ import static com.peters.bookservice.dto.ResponseStatus.SUCCESSFUL;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookServiceImpl implements IBookService{
     private final BookRepository bookRepository;
 
@@ -92,10 +94,10 @@ public class BookServiceImpl implements IBookService{
     @Override
     public ResponseEntity<CustomRequestResponse> getBooksByAuthor(String author) {
         List<Book> books = bookRepository.findByAuthor(author);
-        if(!books.isEmpty()){
-            return ResponseEntity.ok(new CustomRequestResponse(HttpStatus.FOUND.name(), books, "Successful"));
+        if(books.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new CustomRequestResponse("Failed", "No book found with this author's name"));
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new CustomRequestResponse("Failed", "No book found with this author's name"));
+        return ResponseEntity.ok(new CustomRequestResponse(HttpStatus.FOUND.name(), books, "Successful"));
     }
 
     @Override
@@ -129,9 +131,11 @@ public class BookServiceImpl implements IBookService{
     public ResponseEntity<CustomRequestResponse> getBookById(Long bookId) {
         Optional<Book> bookOptional = bookRepository.findById(bookId);
         if(bookOptional.isEmpty()){
+            log.info("No book found for this id-> {}", bookId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomRequestResponse(HttpStatus.NOT_FOUND.name(), "No book found for this id -> "+bookId));
         }
         Book book = bookOptional.get();
+        log.info("Fetched book by id", book);
         BookResponse response = BookResponse.builder()
                 .author(book.getAuthor())
                 .title(book.getTitle())

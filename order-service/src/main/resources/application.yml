@@ -8,6 +8,14 @@ spring:
     import: optional:configserver:http://
     import-check:
       enabled: false
+  data:
+    mongodb:
+      authentication-database: admin
+      username: rootuser
+      password: rootpass
+      database: online_bookstore
+      port: 27017
+      host: localhost
 
 eureka:
   client:
