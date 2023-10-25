@@ -46,4 +46,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FeignResourceNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleFeignResourceNotFoundException(FeignResourceNotFoundException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 }

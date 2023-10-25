@@ -1,8 +1,7 @@
 package com.peters.orderservice.service;
 
 import com.peters.orderservice.controller.proxy.FeignProxy;
-import com.peters.orderservice.dto.BookResponse;
-import com.peters.orderservice.dto.CartResponse;
+
 import com.peters.orderservice.dto.CustomResponse;
 import com.peters.orderservice.model.Cart;
 import com.peters.orderservice.repository.CartRepository;
@@ -16,7 +15,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -87,4 +87,49 @@ public class OrderServiceImpl implements OrderService{
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<CustomResponse> getCart(String cartId) {
+        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+        if(cartOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND, "No cart found for this id -> "+cartId));
+        }
+        Cart cart = cartOptional.get();
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.FOUND.name(), cart, "Successful fetch cart item"));
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> editCart(String cartId, int quantity) {
+        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+        if(cartOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND, "No cart found for this id -> "+cartId));
+        }
+        Cart cart = cartOptional.get();
+        cart.setQuantity(quantity);
+        cart.setSubTotal(cart.getBookPrice().multiply(BigDecimal.valueOf(quantity)));
+        cartRepository.save(cart);
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.FOUND.name(), cart, "Successful updated cart item"));
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> deleteCart(String cartId) {
+        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+        if(cartOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND, "No cart found for this id -> "+cartId));
+        }
+        Cart cart = cartOptional.get();
+        cartRepository.delete(cart);
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.FOUND.name(), cart, "Successful updated item from cart"));
+    }
+
+    @Override
+    public ResponseEntity<?> deleteAllCarts(Long userId) {
+        List<Cart> carts = cartRepository.findByUserId(userId);
+        if(carts.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomResponse(HttpStatus.NOT_FOUND, "No cart found for this id -> "+userId));
+        }
+        for(Cart cart: carts){
+            cartRepository.delete(cart);
+        }
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.OK, "Successful cleared all items from cart"));
+    }
 }

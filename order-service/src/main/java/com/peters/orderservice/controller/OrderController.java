@@ -1,17 +1,13 @@
 package com.peters.orderservice.controller;
 
+
 import com.peters.orderservice.dto.CustomResponse;
-import com.peters.orderservice.dto.ErrorDetails;
 import com.peters.orderservice.dto.FeignErrorHandling;
 import com.peters.orderservice.service.OrderService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -32,6 +28,26 @@ public class OrderController {
     @GetMapping("/{userId}/all-carts")
     public ResponseEntity<?> getAllCarts(@PathVariable("userId") Long userId){
         return orderService.getAllCarts(userId);
+    }
+
+    @GetMapping("/cart/{cartId}")
+    public ResponseEntity<CustomResponse> getCart(@PathVariable("cartId") String cartId){
+        return orderService.getCart(cartId);
+    }
+
+    @PutMapping("/edit/cart/{cartId}")
+    public ResponseEntity<CustomResponse> editCart(@PathVariable("cartId") String cartId, @RequestParam("quantity") int quantity){
+        return orderService.editCart(cartId, quantity);
+    }
+
+    @DeleteMapping("/delete/cart/{cartId}")
+    public ResponseEntity<CustomResponse> deleteCart(@PathVariable("cartId") String cartId){
+        return orderService.deleteCart(cartId);
+    }
+
+    @DeleteMapping("/{userId}/clear-cart")
+    public ResponseEntity<?> deleteAllCarts(@PathVariable("userId") Long userId){
+        return orderService.deleteAllCarts(userId);
     }
 
 }

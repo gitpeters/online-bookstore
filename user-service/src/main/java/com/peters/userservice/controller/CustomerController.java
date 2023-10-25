@@ -8,6 +8,7 @@ import com.peters.userservice.dto.CustomResponse;
 import com.peters.userservice.dto.UserRequestDto;
 import com.peters.userservice.exception.ErrorDetails;
 import com.peters.userservice.exception.FeignErrorHandling;
+import com.peters.userservice.exception.FeignResourceNotFoundException;
 import com.peters.userservice.exception.UserNotFoundException;
 import com.peters.userservice.service.IUserService;
 import feign.FeignException;
@@ -53,7 +54,11 @@ public class CustomerController {
     @GetMapping("/get-all-books")
     public ResponseEntity<?> getAllBooks(@RequestParam(defaultValue = "0") int page){
         try{
-            return bookFeignProxy.getAllBooks(page);
+            ResponseEntity<CustomResponse> allBooks = bookFeignProxy.getAllBooks(page);
+            if(allBooks==null || allBooks.getBody()==null){
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return allBooks;
         }catch (FeignException.NotFound e){
             return feignErrorHandling.handleFeignNotFound(e);
         }
@@ -63,8 +68,8 @@ public class CustomerController {
     public ResponseEntity<?> getBooksByAuthor(@RequestParam("author") String authorName){
         try {
             ResponseEntity<CustomResponse> booksByAuthor = bookFeignProxy.getBooksByAuthor(authorName);
-            if(booksByAuthor.getBody()==null){
-                throw new UserNotFoundException("No Resource found");
+            if(booksByAuthor==null || booksByAuthor.getBody()==null){
+                throw new FeignResourceNotFoundException("No Resource found");
             }
             return booksByAuthor;
         }catch (FeignException.NotFound e){
@@ -78,8 +83,8 @@ public class CustomerController {
     public ResponseEntity<CustomResponse> getBooksByTitle(@RequestParam("title") String title){
        try{
            ResponseEntity<CustomResponse> booksByTitle = bookFeignProxy.getBooksByTitle(title);
-           if(booksByTitle.getBody()==null){
-               throw new UserNotFoundException("No Resource found");
+           if(booksByTitle==null || booksByTitle.getBody()==null){
+               throw new FeignResourceNotFoundException("No Resource found");
            }
            return booksByTitle;
        }catch (FeignException.NotFound e){
@@ -91,8 +96,8 @@ public class CustomerController {
     public ResponseEntity<?> getBooksByPublishedDate(@RequestParam("published_date") String date){
         try{
             ResponseEntity<CustomResponse> booksByPublishedDate = bookFeignProxy.getBooksByPublishedDate(date);
-            if(booksByPublishedDate.getBody().getData()==null){
-                throw new UserNotFoundException("No Resource found");
+            if(booksByPublishedDate==null || booksByPublishedDate.getBody().getData()==null){
+                throw new FeignResourceNotFoundException("No Resource found");
             }
             return booksByPublishedDate;
         }catch (FeignException.NotFound e){
@@ -108,6 +113,71 @@ public class CustomerController {
           return feignErrorHandling.handleFeignNotFound(e);
         }catch (FeignException e){
            return feignErrorHandling.handleFeignError(e);
+        }
+    }
+
+    @GetMapping("/{userId}/carts")
+    public ResponseEntity<?> getAllCarts(@PathVariable("userId") Long userId){
+        try{
+            ResponseEntity<CustomResponse> cartsByUser = orderFeignProxy.getAllCarts(userId);
+            if (cartsByUser == null || cartsByUser.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return cartsByUser;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
+        }
+    }
+
+    @GetMapping("/cart/{cartId}")
+    public ResponseEntity<?> getCart(@PathVariable("cartId") String cartId){
+        try{
+            ResponseEntity<CustomResponse> cartById = orderFeignProxy.getCart(cartId);
+            if (cartById == null || cartById.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return cartById;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
+        }
+    }
+
+    @PutMapping("/edit-cart/{cartId}")
+    public ResponseEntity<?> editCart(@PathVariable("cartId") String cartId, @RequestParam("quantity") int quantity){
+        try{
+            ResponseEntity<CustomResponse> editCartQuantity = orderFeignProxy.editCart(cartId, quantity);
+            if (editCartQuantity == null || editCartQuantity.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return editCartQuantity;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
+        }
+    }
+
+    @DeleteMapping("/delete-cart/{cartId}")
+    public ResponseEntity<?> deleteCart(@PathVariable("cartId") String cartId){
+        try{
+            ResponseEntity<CustomResponse> deletedCart = orderFeignProxy.deleteCart(cartId);
+            if (deletedCart == null || deletedCart.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return deletedCart;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
+        }
+    }
+
+    @DeleteMapping("/{userId}/clear-cart")
+    public ResponseEntity<?> clearCart(@PathVariable("userId") Long userId){
+        try{
+            ResponseEntity<?> deletedCarts = orderFeignProxy.deleteAllCarts(userId);
+            if (deletedCarts == null || deletedCarts.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return deletedCarts;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
         }
     }
 
