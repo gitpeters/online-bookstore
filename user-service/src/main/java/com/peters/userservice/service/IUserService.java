@@ -26,5 +26,7 @@ public interface IUserService {
 
     ResponseEntity<CustomResponse> deleteProfile(Long userId);
 
+    ResponseEntity<?> checkout(Long userId);
+
     ;
 }

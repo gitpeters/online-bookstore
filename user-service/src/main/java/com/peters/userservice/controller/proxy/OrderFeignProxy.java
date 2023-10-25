@@ -24,4 +24,10 @@ public interface OrderFeignProxy {
 
     @DeleteMapping("/{userId}/clear-cart")
     ResponseEntity<?> deleteAllCarts(@PathVariable("userId") Long userId);
+
+    @GetMapping("/{userId}/checkout")
+    ResponseEntity<?> checkout(@PathVariable("userId") Long userId, @RequestParam("user_email") String userEmail);
+
+    @GetMapping("/confirm-payment")
+    ResponseEntity<CustomResponse> confirmPayment(@RequestParam("referenceId") String paymentReferenceId);
 }

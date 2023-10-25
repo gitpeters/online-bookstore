@@ -181,4 +181,24 @@ public class CustomerController {
         }
     }
 
+    @GetMapping("/{userId}/checkout")
+    ResponseEntity<?> checkout(@PathVariable("userId") Long userId){
+        return userService.checkout(userId);
+    }
+
+    @GetMapping("/confirm-payment")
+    public ResponseEntity<?> confirmPayment(@RequestParam("payment_reference_id") String paymentReferenceId){
+        try{
+            ResponseEntity<?> confirmPayments = orderFeignProxy.confirmPayment(paymentReferenceId);
+            if (confirmPayments == null || confirmPayments.getBody() == null) {
+                throw new FeignResourceNotFoundException("No Resource found");
+            }
+            return confirmPayments;
+        }catch (FeignException.NotFound e){
+            return feignErrorHandling.handleFeignNotFound(e);
+        }catch (FeignException.InternalServerError e){
+            return feignErrorHandling.handleFeignError(e);
+        }
+    }
+
 }

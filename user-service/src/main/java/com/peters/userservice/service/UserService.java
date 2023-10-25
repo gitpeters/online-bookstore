@@ -1,6 +1,7 @@
 package com.peters.userservice.service;
 
 
+import com.peters.userservice.controller.proxy.OrderFeignProxy;
 import com.peters.userservice.dto.*;
 import com.peters.userservice.entity.UserAddress;
 import com.peters.userservice.entity.User;
@@ -35,6 +36,7 @@ public class UserService implements IUserService{
     private final IRoleService roleService;
     private final HttpServletRequest servletRequest;
     private final RoleRepository roleRepository;
+    private final OrderFeignProxy orderFeignProxy;
 
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+$";
     private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
@@ -209,6 +211,16 @@ public class UserService implements IUserService{
         userRepository.save(user);
         return  ResponseEntity.ok(new CustomResponse(HttpStatus.OK,"Successfully deleted user" +
                 " profile"));
+    }
+
+    @Override
+    public ResponseEntity<?> checkout(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No user found");
+        }
+        User user = userOptional.get();
+        return orderFeignProxy.checkout(userId, user.getEmail());
     }
 
     @Override
