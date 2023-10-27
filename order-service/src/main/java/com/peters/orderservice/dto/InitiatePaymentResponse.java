@@ -1,4 +1,4 @@
-package com.golivwell.dtos.response;
+package com.peters.orderservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

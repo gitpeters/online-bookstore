@@ -16,4 +16,8 @@ public interface OrderService {
     ResponseEntity<CustomResponse> deleteCart(String cartId);
 
     ResponseEntity<?> deleteAllCarts(Long userId);
+
+    ResponseEntity<?> checkOut(Long userId, String userEmail);
+
+    ResponseEntity<CustomResponse> confirmPayment(String paymentReferenceId);
 }

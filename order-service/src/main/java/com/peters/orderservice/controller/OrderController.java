@@ -50,4 +50,14 @@ public class OrderController {
         return orderService.deleteAllCarts(userId);
     }
 
+    @GetMapping("/{userId}/checkout")
+    public ResponseEntity<?> checkout(@PathVariable("userId") Long userId, @RequestParam("user_email") String userEmail){
+        return orderService.checkOut(userId, userEmail);
+    }
+
+    @GetMapping("/confirm-payment")
+    public ResponseEntity<CustomResponse> confirmPayment(@RequestParam("referenceId") String paymentReferenceId){
+        return orderService.confirmPayment(paymentReferenceId);
+    }
+
 }

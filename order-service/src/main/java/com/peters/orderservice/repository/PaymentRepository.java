@@ -1,7 +1,11 @@
 package com.peters.orderservice.repository;
 
-import com.peters.orderservice.model.Order;
+import com.peters.orderservice.model.Payment;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface OrderRepository extends MongoRepository<Order, String> {
+import java.util.Optional;
+
+public interface PaymentRepository extends MongoRepository<Payment, String> {
+
+    Optional<Payment> findByPaymentReferenceId(String paymentReferenceId);
 }
