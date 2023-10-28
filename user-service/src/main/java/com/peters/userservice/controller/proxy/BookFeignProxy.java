@@ -6,7 +6,11 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "book-service", url = "http://localhost:8080/api/v1/book")
+//@FeignClient(name = "book-service", url = "http://localhost:8080/api/v1/book")
+//@FeignClient(name = "book-service", path="/api/v1/book")
+
+// KUBERNETES CHANGE
+@FeignClient(name = "book-service", url = "${BOOK_SERVICE_HOST:http://localhost}:8080", path="/api/v1/book")
 public interface BookFeignProxy {
     @PostMapping("/add")
     ResponseEntity<CustomResponse> addBook(@RequestBody BookRequest request);

@@ -11,8 +11,8 @@ public class GatewayConfig {
     @Bean
     public RouteLocator gatewayRouter(RouteLocatorBuilder builder){
         return builder.routes()
-                .route(predicate -> predicate.path("get")
-                        .filters(f->f.addRequestHeader("MyHeader", "MYURI")
+                .route(predicate -> predicate.path("get", "post", "put", "delete")
+                        .filters(f->f.addRequestHeader("MyHeader", "URI")
                                 .addRequestParameter("MyParams", "ParamValue"))
                         .uri("http://httpbin.org:80"))
                 .route(predicate->predicate.path("/api/v1/book/**")

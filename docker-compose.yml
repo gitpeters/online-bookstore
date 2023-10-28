@@ -1,16 +1,25 @@
 version: "3.8"
 services:
+
+  mydatabase:
+    image: mysql:8.0.27
+    container_name: database
+    environment:
+      MYSQL_ROOT_PASSWORD: Ab@230596
+      MYSQL_DATABASE: online_bookstore
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   mongodb:
     image: mongo
     container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - data:/data
+      - data:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=rootuser
       - MONGO_INITDB_ROOT_PASSWORD=rootpass
-
 
   mongo-express:
     image: mongo-express
@@ -23,8 +32,91 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
       - ME_CONFIG_MONGODB_SERVER=mongodb
 
+  user-service:
+    image: techiebroz/bookstore-user-service:0.0.1-SNAPSHOT
+    container_name: user-service
+    mem_limit: 700m
+    ports:
+      - "8082:8082"
+    depends_on:
+    - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:mysql://mydatabase:3306/online_bookstore
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Ab@230596
+
+  book-service:
+    image: techiebroz/bookstore-book-service:0.0.1-SNAPSHOT
+    container_name: book-service
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    depends_on:
+    - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:mysql://mydatabase:3306/online_bookstore
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Ab@230596
+
+  api-gateway:
+    image: techiebroz/bookstore-api-gateway:0.0.1-SNAPSHOT
+    container_name: api-gateway
+    mem_limit: 700m
+    ports:
+      - "8765:8765"
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+
+  order-service:
+    image: techiebroz/bookstore-order-service:0.0.1-SNAPSHOT
+    container_name: order-service
+    mem_limit: 700m
+    ports:
+      - "8081:8081"
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING_DATA_MONGODB_AUTHENTICATION-DATABASE: admin
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_USERNAME: rootuser
+      SPRING_DATA_MONGODB_PASSWORD: rootpass
+      SPRING_DATA_MONGODB_DATABASE: online_bookstore
+      SPRING_DATA_MONGODB_PORT: 27017
+      MONGOEXPRESS_LOGIN: rootuser
+      MONGOEXPRESS_PASSWORD: rootpass
+      MONGOEXPRESS_MONGODB_SERVER: mongodb
+
+
+  naming-server:
+    image: techiebroz/bookstore-naming-server:0.0.1-SNAPSHOT
+    container_name: naming-server
+    ports:
+      - "8761:8761"
+    mem_limit: 700m
+
+  zipkin-server:
+    image: openzipkin/zipkin:2.23
+    container_name: zipkin-server
+    mem_limit: 300m
+    ports:
+      - "9411:9411"
+
 volumes:
   data: {}
+  mysql_data:
 
 networks:
   default:
