@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  selector:
+    matchLabels:
+      app: user-service
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: bookstore-user-service
+          image: techiebroz/bookstore-user-service:0.0.3-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:   # Setting Enviornmental Variables
+            - name: BOOK_SERVICE_HOST
+              value: book-service
+            - name: DB_HOST   # Setting Database host address from configMap
+              valueFrom :
+                configMapKeyRef :
+                  name : db-config
+                  key :  host
+
+            - name: DB_NAME  # Setting Database name from configMap
+              valueFrom :
+                configMapKeyRef :
+                  name : db-config
+                  key :  dbName
+
+            - name: DB_USERNAME
+              value: root
+
+            - name: DB_PASSWORD
+              value: Ab@230596
+
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+    - protocol: "TCP"
+      port: 8082 # The port that the service is running on in the cluster
+      targetPort: 8082 # The port exposed by the service
+  type: LoadBalancer # type of the service.

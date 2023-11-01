@@ -6,6 +6,7 @@ import com.peters.userservice.dto.*;
 import com.peters.userservice.entity.UserAddress;
 import com.peters.userservice.entity.User;
 import com.peters.userservice.entity.UserRole;
+import com.peters.userservice.exception.FeignResourceNotFoundException;
 import com.peters.userservice.repository.IUserAddressRepository;
 import com.peters.userservice.repository.IUserRepository;
 import com.peters.userservice.repository.RoleRepository;
@@ -220,7 +221,12 @@ public class UserService implements IUserService{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No user found");
         }
         User user = userOptional.get();
-        return orderFeignProxy.checkout(userId, user.getEmail());
+        ResponseEntity<?> checkoutResponse = orderFeignProxy.checkout(userId, user.getEmail());
+        log.info("Successfully made a request call to order-service {} ", checkoutResponse);
+        if(checkoutResponse==null || checkoutResponse.getBody()==null){
+            throw new FeignResourceNotFoundException("No resource found");
+        }
+        return checkoutResponse;
     }
 
     @Override

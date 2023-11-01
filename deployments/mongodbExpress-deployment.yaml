@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-express
+  template:
+    metadata:
+      labels:
+        app: mongodb-express
+    spec:
+      containers:
+        - name: mongodb-express
+          image: mongo-express:latest
+          ports:
+            - containerPort: 8081  # MongoDB Express default port
+          env:
+            - name: ME_CONFIG_BASICAUTH_USERNAME
+              value: rootuser
+            - name: ME_CONFIG_BASICAUTH_PASSWORD
+              value: rootpass
+            - name: ME_CONFIG_MONGODB_SERVER
+              value: mongodb
+            - name: ME_CONFIG_MONGODB_PORT
+              value: "27017"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-express
+spec:
+  selector:
+    app: mongodb-express  # Match the labels with your MongoDB Express Deployment
+  ports:
+    - protocol: "TCP"
+      port: 8081  # MongoDB Express default port

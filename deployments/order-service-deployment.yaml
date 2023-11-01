@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: bookstore-order-service
+          image: techiebroz/bookstore-order-service:0.0.3-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: MONGODB_HOST  # MongoDB host from application.yaml
+              value: mongodb
+            - name: MONGODB_PORT  # MongoDB port from application.yaml
+              value: "27017"
+            - name: MONGODB_DATABASE  # MongoDB database name from application.yaml
+              value: online_bookstore
+            - name: MONGODB_USERNAME  # MongoDB username from Secret
+              value: rootuser
+            - name: MONGODB_PASSWORD  # MongoDB password from Secret
+              value: rootpass
+            - name: HOST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-config
+                  key: host
+
+
+
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - protocol: "TCP"
+      port: 8081 # The port that the service is running on in the cluster
+      targetPort: 8081 # The port exposed by the service
+  type: LoadBalancer # type of the service.
+
+---
+apiVersion : v1
+kind : ConfigMap
+metadata:
+  name : mongodb-config
+data:
+  host : mongodb
