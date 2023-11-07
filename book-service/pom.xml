@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.peters</groupId>
 	<artifactId>book-service</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<name>book-service</name>
 	<description>Online Bookstore Microservice</description>
 	<properties>
@@ -30,16 +30,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- KUBERNETES-CHANGE: Disabled spring-config		-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-starter-config</artifactId>-->
-<!--		</dependency>-->
-		<!-- KUBERNETES-CHANGE: Disabled eureka-client	-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -69,11 +67,10 @@
 			<artifactId>micrometer-tracing-bridge-otel</artifactId>
 		</dependency>
 
-		<!-- KUBERNETES-CHANGE: Disabled zipkin		-->
-<!--		<dependency>-->
-<!--			<groupId>io.opentelemetry</groupId>-->
-<!--			<artifactId>opentelemetry-exporter-zipkin</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>io.opentelemetry</groupId>
+			<artifactId>opentelemetry-exporter-zipkin</artifactId>
+		</dependency>
 
 		<!-- enable tracing of REST API calls made using feign		-->
 		<dependency>

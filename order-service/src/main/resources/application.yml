@@ -11,11 +11,11 @@ spring:
   data:
     mongodb:
       authentication-database: admin
-      username: ${MONGODB_USERNAME}  # These values come from the Kubernetes Secret
-      password: ${MONGODB_PASSWORD}
+      username: rootuser
+      password: rootpass
       database: online_bookstore
       port: 27017
-      host: ${HOST_NAME}
+      host: mongodb
 
 eureka:
   client:

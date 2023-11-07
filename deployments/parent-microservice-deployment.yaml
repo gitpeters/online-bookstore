@@ -1,0 +1,289 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mysql-pv-claim
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: mysql
+    spec:
+      selector:
+        matchLabels:
+          app: mysql
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: mysql
+        spec:
+          containers:
+            - image: mysql:8.0
+              name: mysql
+              env:
+                - name: MYSQL_ROOT_PASSWORD
+                  value: Ab@230596
+                - name: MYSQL_ROOT_USERNAME
+                  value: root
+                - name: MYSQL_DATABASE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: db-config
+                      key: dbName
+              ports:
+                - containerPort: 3306
+                  name: mysql
+              volumeMounts:
+                - name: mysql-persistent-storage
+                  mountPath: /var/lib/mysql
+          volumes:
+            - name: mysql-persistent-storage
+              persistentVolumeClaim:
+                claimName: mysql-pv-claim
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: mysql
+    spec:
+      ports:
+        - port: 3306
+          targetPort: 3306
+      selector:
+        app: mysql
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: db-config
+    data:
+      host: mysql
+      dbName: online_bookstore
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: book-service
+    spec:
+      selector:
+        matchLabels:
+          app: book-service
+      replicas: 2
+      template:
+        metadata:
+          labels:
+            app: book-service
+        spec:
+          containers:
+            - name: bookstore-book-service
+              image: techiebroz/bookstore-book-service:0.0.2-SNAPSHOT
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 8080
+              env:
+                - name: DB_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: db-config
+                      key: host
+                - name: DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: db-config
+                      key: dbName
+                - name: DB_USERNAME
+                  value: root
+                - name: DB_PASSWORD
+                  value: Ab@230596
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: book-service
+    spec:
+      ports:
+        - protocol: "TCP"
+          port: 8080
+          targetPort: 8080
+      selector:
+        app: book-service
+      type: LoadBalancer
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: user-service
+    spec:
+      selector:
+        matchLabels:
+          app: user-service
+      replicas: 2
+      template:
+        metadata:
+          labels:
+            app: user-service
+        spec:
+          containers:
+            - name: bookstore-user-service
+              image: techiebroz/bookstore-user-service:0.0.3-SNAPSHOT
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 8082
+              env:
+                - name: BOOK_SERVICE_HOST
+                  value: book-service
+                - name: ORDER_SERVICE_HOST
+                  value: order-service
+                - name: DB_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: db-config
+                      key: host
+                - name: DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: db-config
+                      key: dbName
+                - name: DB_USERNAME
+                  value: root
+                - name: DB_PASSWORD
+                  value: Ab@230596
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: user-service
+    spec:
+      ports:
+        - protocol: "TCP"
+          port: 8082
+          targetPort: 8082
+      selector:
+        app: user-service
+      type: LoadBalancer
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mongodb-pv-claim
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: mongodb
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: mongodb
+      template:
+        metadata:
+          labels:
+            app: mongodb
+        spec:
+          containers:
+            - name: mongodb
+              image: mongo:latest
+              ports:
+                - containerPort: 27017
+              env:
+                - name: MONGO_INITDB_ROOT_USERNAME
+                  value: rootuser
+                - name: MONGO_INITDB_ROOT_PASSWORD
+                  value: rootpass
+                - name: MONGO_INITDB_DATABASE
+                  value: online_bookstore
+              volumeMounts:
+                - name: mongodb-data
+                  mountPath: /data/db
+          volumes:
+            - name: mongodb-data
+              persistentVolumeClaim:
+                claimName: mongodb-pv-claim
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: mongodb
+    spec:
+      selector:
+        app: mongodb
+      ports:
+        - protocol: "TCP"
+          port: 27017
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: order-service
+    spec:
+      selector:
+        matchLabels:
+          app: order-service
+      replicas: 2
+      template:
+        metadata:
+          labels:
+            app: order-service
+        spec:
+          containers:
+            - name: bookstore-order-service
+              image: techiebroz/bookstore-order-service:0.0.3-SNAPSHOT
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 8081
+              env:
+                - name: BOOK_SERVICE_HOST
+                  value: book-service
+                - name: MONGODB_HOST
+                  value: mongodb
+                - name: MONGODB_PORT
+                  value: "27017"
+                - name: MONGODB_DATABASE
+                  value: online_bookstore
+                - name: MONGODB_USERNAME
+                  value: rootuser
+                - name: MONGODB_PASSWORD
+                  value: rootpass
+                - name: HOST_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: mongodb-config
+                      key: host
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: order-service
+    spec:
+      ports:
+        - protocol: "TCP"
+          port: 8081
+          targetPort: 8081
+      selector:
+        app: order-service
+      type: LoadBalancer
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: mongodb-config
+    data:
+      host: mongodb
+

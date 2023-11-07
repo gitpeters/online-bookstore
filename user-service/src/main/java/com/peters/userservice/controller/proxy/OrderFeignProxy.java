@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 //@FeignClient(name = "order-service", url = "http://localhost:8081/api/v1/orders")
-//@FeignClient(name = "order-service", path="/api/v1/orders")
+@FeignClient(name = "order-service", path="/api/v1/orders")
 
 // KUBERNETES CHANGE
-@FeignClient(name = "order-service", url = "${ORDER_SERVICE_HOST:http://localhost}:8081", path="/api/v1/orders")
+//@FeignClient(name = "order-service", url = "${ORDER_SERVICE_HOST:http://localhost}:8081", path="/api/v1/orders")
 public interface OrderFeignProxy {
     @GetMapping("/add-to-cart")
     ResponseEntity<CustomResponse> addBookToCart(@RequestParam("bookId") Long bookId, @RequestParam("userId") Long userId, @RequestParam("quantity") int quantity);

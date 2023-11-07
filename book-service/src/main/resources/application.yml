@@ -6,12 +6,9 @@ spring:
     name: book-service
   datasource:
 #    url: jdbc:mysql://localhost:3306/online_bookstore
-#    url: jdbc:mysql://mydatabase:3306/online_bookstore
-#    username: root
-#    password: Ab@230596
-    url: jdbc:mysql://${DB_HOST}/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://mydatabase:3306/online_bookstore
+    username: root
+    password: Ab@230596
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

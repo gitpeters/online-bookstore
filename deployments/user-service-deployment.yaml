@@ -21,6 +21,8 @@ spec:
           env:   # Setting Enviornmental Variables
             - name: BOOK_SERVICE_HOST
               value: book-service
+            - name: ORDER_SERVICE_HOST
+              value: order-service
             - name: DB_HOST   # Setting Database host address from configMap
               valueFrom :
                 configMapKeyRef :
